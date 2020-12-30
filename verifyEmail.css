@@ -2,6 +2,7 @@ html,body {
     width:100%;
     height:100%;
     min-width: 40%;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 img,h1{
     vertical-align: middle;
@@ -12,40 +13,44 @@ img{
 }
 #logoAndName{
     padding-top: 3%;
-    padding-bottom: 3%;
+    padding-bottom: 0%;
     width: fit-content;
     margin: auto;
 }
 body{
-    z-index: 1;
+    margin-top: 0;
+    margin-left: 0;
 }
 h1{
+    font-family: Calibri, 'Trebuchet MS', Impact, sans-serif;
     text-align: center;
-    color: white;
+    color: whitesmoke;
+    font-size: 35px;
 }
 #VerifyButton{
  background-color: teal;
  color: white;
  border-radius: 10px;
  height: 40px;
- width: 120px;
+ width: 100px;
  border-color: transparent;
  margin:auto;
  display:block;
+ font-size: medium;
 }
 #helloMessage{
-    padding-top: 8%;
+    padding-top: 2%;
 }
 .message{
     text-align: justify;
     padding-left: 10%;
     padding-right: 10%;
+    font-size: medium;
 }
-header{
-    width: 100%;
+#header{
+    background-image: linear-gradient(to top left,pink,teal);
+    overflow: hidden;
 }
 svg{
-    position: absolute;
-    z-index: -1;
-    top:0;
+display: block;
 }
