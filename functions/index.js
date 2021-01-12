@@ -38,7 +38,7 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
     StorageLeft: 2 *1024 *1024 *1024
     };
     
-  return await admin.auth().setCustomUserClaims(user.uid,customClaims);
+  return admin.auth().setCustomUserClaims(user.uid,customClaims);
   });
 
 
