@@ -21,6 +21,9 @@ body{
     margin-top: 0;
     margin-left: 0;
 }
+a{
+    text-decoration: none;
+}
 h1{
     font-family: Calibri, 'Trebuchet MS', Impact, sans-serif;
     text-align: center;
