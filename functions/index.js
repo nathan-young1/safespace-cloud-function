@@ -6,33 +6,41 @@ admin.initializeApp();
 exports.fileCreated = functions.storage.object().onFinalize(async (object,context) => {
   const fileSize = object.size;
   const uid = context.auth.uid;
-  console.log(fileSize);
-  const doc = admin.firestore().collection('Available Storage Space').doc(uid);
-  const storageSpaceLeft = ((await doc.get()).data[0]) - fileSize;
-  return doc.update({StorageLeft: storageSpaceLeft});
+  console.log(`${fileSize} ${uid}`);
+  const currentSpace = context.auth.token.StorageLeft;
+  const storageSpaceLeft = currentSpace - fileSize;
+  const customClaims = {
+    StorageLeft: storageSpaceLeft
+    };
+
+  return await admin.auth().setCustomUserClaims(uid,customClaims);
   });
 
 
   exports.fileDeleted = functions.storage.object().onDelete(async (object,context)=> {
     const fileSize = object.size;
     const uid = context.auth.uid;
-    console.log(fileSize);
-    const doc = admin.firestore().collection('Available Storage Space').doc(uid);
-    const storageSpaceLeft = ((await doc.get()).data[0]) + fileSize;
-    return doc.update({StorageLeft: storageSpaceLeft});
+    console.log(`${fileSize} ${uid}`);
+    const currentSpace = context.auth.token.StorageLeft;
+    const storageSpaceLeft = currentSpace + fileSize;
+
+    const customClaims = {
+      StorageLeft: storageSpaceLeft
+      };
+    
+  return await admin.auth().setCustomUserClaims(uid,customClaims);
   });
 
 
   exports.userCreate = functions.auth.user().onCreate((user) => {
-      const doc = admin.firestore().collection('Available Storage Space').doc(user.uid);
-      return doc.create({StorageLeft: 2 *1024 *1024 *1924});
+    
+  const customClaims = {
+    StorageLeft: 2 *1024 *1024 *1024
+    };
+    
+  return await admin.auth().setCustomUserClaims(user.uid,customClaims);
   });
 
-
-  exports.userDelete = functions.auth.user().onDelete((user)=> {
-    const doc = admin.firestore().collection('Available Storage Space').doc(user.uid);
-    return doc.delete();
-  });
 
 
 // // Create and Deploy Your First Cloud Functions
