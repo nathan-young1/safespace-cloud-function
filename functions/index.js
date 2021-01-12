@@ -1,32 +1,39 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+admin.initializeApp();
 
-exports.fileUploadLimit = functions.storage.object().onFinalize(async (object) => {
-    const fileSizeLimit = 2000000;
-    const uploadFileSize = object.size;
-    console.log(uploadFileSize);
-    const storageLeft = fileSizeLimit - uploadFileSize;
-    const customClaims = {
-        fileStorageLeft: storageLeft,
-        canWrite: (storageLeft < 0)? false : true
-      };
-      
-    return admin.auth().setCustomUserClaims((object.owner.entityId),customClaims);
+
+exports.fileCreated = functions.storage.object().onFinalize(async (object,context) => {
+  const fileSize = object.size;
+  const uid = context.auth.uid;
+  console.log(fileSize);
+  const doc = admin.firestore().collection('Available Storage Space').doc(uid);
+  const storageSpaceLeft = ((await doc.get()).data[0]) - fileSize;
+  return doc.update({StorageLeft: storageSpaceLeft});
   });
+
+
+  exports.fileDeleted = functions.storage.object().onDelete(async (object,context)=> {
+    const fileSize = object.size;
+    const uid = context.auth.uid;
+    console.log(fileSize);
+    const doc = admin.firestore().collection('Available Storage Space').doc(uid);
+    const storageSpaceLeft = ((await doc.get()).data[0]) + fileSize;
+    return doc.update({StorageLeft: storageSpaceLeft});
+  });
+
 
   exports.userCreate = functions.auth.user().onCreate((user) => {
-    // Check if user meets role criteria.
-    // if (user.email &&
-    //     user.email.endsWith('@admin.example.com') &&
-    //     user.emailVerified) {
-      const customClaims = {
-        fileStorageLeft: 2000000,
-        canWrite: true
-      };
-      // Set custom user claims on this newly created user.
-      return admin.auth().setCustomUserClaims(user.uid, customClaims);
-    //}
+      const doc = admin.firestore().collection('Available Storage Space').doc(user.uid);
+      return doc.create({StorageLeft: 2 *1024 *1024 *1924});
   });
+
+
+  exports.userDelete = functions.auth.user().onDelete((user)=> {
+    const doc = admin.firestore().collection('Available Storage Space').doc(user.uid);
+    return doc.delete();
+  });
+
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
