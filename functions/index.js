@@ -3,12 +3,16 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 
 
-exports.fileCreated = functions.storage.object('user/{userUid}/{collection}').onFinalize(async (object,context) => {
-  console.log('joe the joe');
-  console.log(context.params.userUid);
-  console.log(context.auth.uid());
-  const fileSize = Number(object.size);
-  const uid = String(context.auth.uid);
+exports.fileCreated = functions.storage.object().onFinalize(async (object,context) => {
+  console.log(context.resource.name);
+  console.log(String(`${context.resource.name}`));
+  let uidss = String(context.resource.name).split('/')[7];
+  let uids = String(context.resource.name).split('/')[6];
+  console.log(`${uidss} finished await`);
+  console.log(`${uids} finished name`);
+  console.log(`${context.resource.labels} finished service`);
+  const fileSize = object.size;
+  const uid = context.auth.uid;
   console.log(`${fileSize} ${context.auth.uid}`);
   const currentSpace = Number(context.auth.token.storageLeft);
   const storageSpaceLeft = currentSpace - fileSize;
@@ -18,9 +22,13 @@ exports.fileCreated = functions.storage.object('user/{userUid}/{collection}').on
 
 
   exports.fileDeleted = functions.storage.object().onDelete(async (object,context)=> {
-    const fileSize = Number(object.size);
-    const uid = String(context.auth.uid);
-    console.log(`${fileSize} ${uid}`);
+    let uidss = String(context.resource).split('/')[7];
+    let uids = String(context.resource).split('/')[6];
+    console.log(`${uidss} finished await`);
+    console.log(`${uids} finished name`);
+    const fileSize = object.size;
+    const uid = await admin.auth().getUser;
+    console.log(`${fileSize} ${context.params}`);
     const currentSpace = Number(context.auth.token.storageLeft);
     const storageSpaceLeft = currentSpace + fileSize;
     
@@ -33,7 +41,6 @@ exports.fileCreated = functions.storage.object('user/{userUid}/{collection}').on
     console.log(user.uid);
     admin.auth().setCustomUserClaims(uid,{storageLeft: 2 *1024 *1024 *1024}).then(async (full,reject)=>{
       console.log((await admin.auth().getUser(uid)).customClaims);
-      console.log('starteddsad');
       console.log('startefdsrrr');
       return 'finished creating user';
     }
