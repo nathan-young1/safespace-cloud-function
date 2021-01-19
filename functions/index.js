@@ -6,7 +6,7 @@ admin.initializeApp();
 exports.fileCreated = functions.storage.object().onFinalize(async (object,context) => {
   const uid = String(context.resource.name).split('/')[6];
   console.log(`${uid} finished name`);
-  const fileSize = object.size;
+  const fileSize = Number(object.size);
   console.log(`${fileSize} ${uid}`);
   const currentSpace = Number((await admin.auth().getUser(uid)).customClaims.storageLeft);
   const storageSpaceLeft = currentSpace - fileSize;
@@ -20,7 +20,7 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
   exports.fileDeleted = functions.storage.object().onDelete(async (object,context)=> {
     const uid = String(context.resource.name).split('/')[6];
     console.log(`${uid} finished name`);
-    const fileSize = object.size;
+    const fileSize = Number(object.size);
     console.log(`${fileSize} ${uid}`);
     const currentSpace = Number((await admin.auth().getUser(uid)).customClaims.storageLeft);
     const storageSpaceLeft = currentSpace + fileSize;
