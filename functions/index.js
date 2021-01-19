@@ -12,7 +12,9 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
   const currentSpace = Number(context.auth.token.storageLeft);
   const storageSpaceLeft = currentSpace - fileSize;
 
-  return await admin.auth().setCustomUserClaims(uid,{storageLeft: storageSpaceLeft});
+  await admin.auth().setCustomUserClaims(uid,{storageLeft: storageSpaceLeft});
+  console.log((await admin.auth().getUser(uid)).customClaims);
+  return 'File Created';
   });
 
 
@@ -24,22 +26,19 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
     const currentSpace = Number(context.auth.token.storageLeft);
     const storageSpaceLeft = currentSpace + fileSize;
     
-  return await admin.auth().setCustomUserClaims(uid,{storageLeft: storageSpaceLeft});
+  await admin.auth().setCustomUserClaims(uid,{storageLeft: storageSpaceLeft});
+  console.log((await admin.auth().getUser(uid)).customClaims);
+  return 'File Deleted';
   });
 
 
-  exports.userCreate = functions.auth.user().onCreate((user) => {
+  exports.userCreate = functions.auth.user().onCreate(async (user) => {
     let uid = user.uid;
     console.log(user.uid);
-    admin.auth().setCustomUserClaims(uid,{storageLeft: 2 *1024 *1024 *1024}).then(async (full,reject)=>{
-      console.log((await admin.auth().getUser(uid)).customClaims);
-      console.log('startefdsrrr');
+    await admin.auth().setCustomUserClaims(uid,{storageLeft: 2 *1024 *1024 *1024});
+    console.log((await admin.auth().getUser(uid)).customClaims);
+
       return 'finished creating user';
-    }
-      ).catch(e=>{
-        console.log(e);
-      });
-  return 'finished creating user';
   });
 
 
