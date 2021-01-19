@@ -20,10 +20,10 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
   exports.fileDeleted = functions.storage.object().onDelete(async (object,context)=> {
     const uid = String(context.resource.name).split('/')[6];
     console.log(`${uid} finished name`);
-    const fileSize = Number(object.size);
+    const fileSize = parseInt(object.size,10);
     console.log(`${fileSize} ${uid}`);
     const currentSpace = Number((await admin.auth().getUser(uid)).customClaims.storageLeft);
-    const storageSpaceLeft = currentSpace + fileSize;
+    const storageSpaceLeft = parseInt(currentSpace,10) + fileSize;
     
   await admin.auth().setCustomUserClaims(uid,{storageLeft: storageSpaceLeft});
   console.log((await admin.auth().getUser(uid)).customClaims);
