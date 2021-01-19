@@ -8,7 +8,7 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
   console.log(`${uid} finished name`);
   const fileSize = object.size;
   console.log(`${fileSize} ${uid}`);
-  const currentSpace = Number(context.auth.token.storageLeft);
+  const currentSpace = Number((await admin.auth().getUser(uid)).customClaims.storageLeft);
   const storageSpaceLeft = currentSpace - fileSize;
 
   await admin.auth().setCustomUserClaims(uid,{storageLeft: storageSpaceLeft});
@@ -22,7 +22,7 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
     console.log(`${uid} finished name`);
     const fileSize = object.size;
     console.log(`${fileSize} ${uid}`);
-    const currentSpace = Number(context.auth.token.storageLeft);
+    const currentSpace = Number((await admin.auth().getUser(uid)).customClaims.storageLeft);
     const storageSpaceLeft = currentSpace + fileSize;
     
   await admin.auth().setCustomUserClaims(uid,{storageLeft: storageSpaceLeft});
