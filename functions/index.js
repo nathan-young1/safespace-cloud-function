@@ -4,9 +4,8 @@ admin.initializeApp();
 
 
 exports.fileCreated = functions.storage.object().onFinalize(async (object,context) => {
-  let uid = String(context.resource.name).split('/')[6];
+  const uid = String(context.resource.name).split('/')[6];
   console.log(`${uid} finished name`);
-  console.log(`${context.resource.labels} finished service`);
   const fileSize = object.size;
   console.log(`${fileSize} ${uid}`);
   const currentSpace = Number(context.auth.token.storageLeft);
@@ -19,7 +18,7 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
 
 
   exports.fileDeleted = functions.storage.object().onDelete(async (object,context)=> {
-    let uid = String(context.resource.name).split('/')[6];
+    const uid = String(context.resource.name).split('/')[6];
     console.log(`${uid} finished name`);
     const fileSize = object.size;
     console.log(`${fileSize} ${uid}`);
@@ -38,7 +37,7 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
     await admin.auth().setCustomUserClaims(uid,{storageLeft: 2 *1024 *1024 *1024});
     console.log((await admin.auth().getUser(uid)).customClaims);
 
-      return 'finished creating user';
+    return 'finished creating user';
   });
 
 
