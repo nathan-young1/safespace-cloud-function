@@ -1,11 +1,14 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { database } = require('firebase-admin');
+const fs = require('fs').promises;
 admin.initializeApp();
 
 
 exports.fileCreated = functions.storage.object().onFinalize(async (object,context) => {
   const uid = String(context.resource.name).split('/')[6];
   console.log(`${uid} finished name`);
+  console.log(context.resource.name);
   const fileSize = Number(object.size);
   console.log(`${fileSize} ${uid}`);
   const currentSpace = Number((await admin.auth().getUser(uid)).customClaims.storageLeft);
@@ -20,6 +23,7 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
   exports.fileDeleted = functions.storage.object().onDelete(async (object,context)=> {
     const uid = String(context.resource.name).split('/')[6];
     console.log(`${uid} finished name`);
+    console.log(context.resource.name);
     const fileSize = parseInt(object.size,10);
     console.log(`${fileSize} ${uid}`);
     const currentSpace = Number((await admin.auth().getUser(uid)).customClaims.storageLeft);
@@ -33,13 +37,22 @@ exports.fileCreated = functions.storage.object().onFinalize(async (object,contex
 
   exports.userCreate = functions.auth.user().onCreate(async (user) => {
     let uid = user.uid;
+    let time = new Date().getTime();
     console.log(user.uid);
+    let file = await fs.writeFile('TimeStamp',`${time}`);
     await admin.auth().setCustomUserClaims(uid,{storageLeft: 2 *1024 *1024 *1024});
+    await admin.firestore().doc(`${uid}`).set({timeStamp: time});
+    await admin.storage().bucket().upload(file);
     console.log((await admin.auth().getUser(uid)).customClaims);
-
     return 'finished creating user';
   });
 
+  exports.userDelete = functions.auth.user().onDelete(async (user) => {
+    const userUid = user.uid;
+    const docPath = user.uid;
+    await admin.firestore().doc(`${userUid}`).delete();
+    await admin.storage().bucket().file(docPath).delete();
+  });
 
 
 // // Create and Deploy Your First Cloud Functions
