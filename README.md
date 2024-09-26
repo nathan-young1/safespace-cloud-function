@@ -1,2 +1,2 @@
-# safespace-smtp
-A mail transfer protocol for safe space
+# safespace-cloud function
+serverless cloud functions for the password manager
